@@ -13,10 +13,15 @@ authors = [
     { name = "NostraDavid", email = "55331731+NostraDavid@users.noreply.github.com" },
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "click>=8.3.0",
+    "numba>=0.62.1",
+    "numpy>=2.3.3",
+    "structlog>=25.4.0",
+]
 
 [project.scripts]
-rusttt = "rusttt:main"
+rusttt = "rusttt:cli.cli"
 
 [dependency-groups]
 dev = [
@@ -114,6 +119,7 @@ select = [
 
 # # Ignore specific rules that might be too strict for this project
 ignore = [
+    "T201",   # print found (allow for debugging/examples)
     "S101",   # I want to be able to run asserts in source as well.
     "TRY300", # Consider moving this statement to an `else` block
     "ARG002", # Unused method argument
