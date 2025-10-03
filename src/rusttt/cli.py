@@ -3,7 +3,7 @@ from __future__ import annotations
 import click
 from structlog.stdlib import get_logger
 
-from rusttt.main import print_board, run_perft_inline, set_starting_position
+from rusttt.logic import print_board, run_perft_inline, set_starting_position
 
 logger = get_logger(__name__)
 
@@ -23,4 +23,4 @@ def run() -> None:
     print_board()
 
     run_perft_inline(6)
-    # RunPerftInlineStruct(6)
+    # RunPerftInlineStruct(6)  # noqa: ERA001

@@ -25,20 +25,21 @@ rusttt = "rusttt:cli.cli"
 
 [dependency-groups]
 dev = [
-    "coverage[toml]>=7.10.1",    # coverage
-    "hypothesis>=6.136.6",       # generative testing
-    "mutmut>=3.3.1",             # mutation testing
-    "pytest-cov>=7.0.0",         # coverage for pytest
-    "pytest-dotenv>=0.5.2",      # for loading environment variables from .env files in tests
+    "coverage[toml]>=7.10.1", # coverage
+    "hypothesis>=6.136.6", # generative testing
+    "mutmut>=3.3.1", # mutation testing
+    "pytest-cov>=7.0.0", # coverage for pytest
+    "pytest-dotenv>=0.5.2", # for loading environment variables from .env files in tests
     "pytest-integration>=0.2.3", # for @mark additions
-    "pytest-mock>=3.14.1",       # for mocking in tests
-    "pytest>=8.4.1",             # testing framework
-    "ruff>=0.12.8",              # linter and formatter
-    "scalene>=1.5.51",           # profiling
-    "tox-uv>=1.16.0",            # to ensure tox can use uv
-    "tox>=4.28.3",               # to run tests in different environments
-    "ty>=0.0.1a21",              # type checking
-    "uv>=0.8.8",                 # normally I would let my OS handle this, but NixOS has version 0.7.x, and I want to use 0.8.x
+    "pytest-mock>=3.14.1", # for mocking in tests
+    "pytest>=8.4.1", # testing framework
+    "ruff>=0.12.8", # linter and formatter
+    "scalene>=1.5.51", # profiling
+    "tox-uv>=1.16.0", # to ensure tox can use uv
+    "tox>=4.28.3", # to run tests in different environments
+    "ty>=0.0.1a21", # type checking
+    "uv>=0.8.8", # normally I would let my OS handle this, but NixOS has version 0.7.x, and I want to use 0.8.x
+    "vulture>=2.14",
 ]
 
 [[tool.uv.index]]
@@ -251,54 +252,26 @@ commands = [
     ],
 ]
 
-[tool.tox.env.black]
-description = "Validate whether black auto-formatting has been applied"
-commands = [["black", ".", "--check", "--diff"]]
-
-[tool.tox.env.isort]
-description = "Validates whether the import order is pep8 compliant"
-commands = [["isort", ".", "--check-only"]]
-
-[tool.tox.env.bandit]
-description = "Check whether there are obvious security issues with codebase"
-skip_install = true
-commands = [["bandit", "-r", "src/"]]
-
-[tool.tox.env.flake8]
-description = "Validate PEP8 compliance"
-commands = [["flake8", "src/", "tests/"]]
-
-[tool.tox.env.mypy]
+[tool.tox.env.ruff]
 description = "Verify and control type hints within your source code"
-commands = [["mypy", "."]]
+commands = [["ruff", "check", "."]]
+
+[tool.tox.env.ty]
+description = "Verify and control type hints within your source code"
+commands = [["ty", "check", "."]]
 
 [tool.tox.env.linters]
 description = "Apply various tools, see tox -a -v"
 skip_install = true
 commands = [
     [
-        "black",
+        "ruff",
+        "check",
         ".",
-        "--check",
-        "--diff",
     ],
     [
-        "isort",
-        ".",
-        "--check-only",
-    ],
-    [
-        "bandit",
-        "-r",
-        "src/",
-    ],
-    [
-        "flake8",
-        "src/",
-        "tests/",
-    ],
-    [
-        "mypy",
+        "ty",
+        "check",
         ".",
     ],
 ]

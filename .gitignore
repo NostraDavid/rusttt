@@ -2,8 +2,9 @@
 /*
 
 # unignore folders
-!docs
-!src
+!docs/
+!src/
+!tests/
 
 # unignore files
 !.bumpversion.cfg
