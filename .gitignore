@@ -17,3 +17,8 @@
 # reignore subfolders/files *anywhere* in the project
 __pycache__
 *.egg-info
+!.envrc
+!devenv.nix
+!devenv.yaml
+!devenv.lock
+!Justfile

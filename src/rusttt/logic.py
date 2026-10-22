@@ -185,7 +185,7 @@ def pin_mask_for_square(
 ) -> int:
     """Return the allowed ray mask for a pinned piece, or ``MAX_ULONG`` if free."""
 
-    if hasattr(pins, "get"):
+    if isinstance(pins, Mapping):
         return pins.get(square, MAX_ULONG)
 
     for pin in pins:  # pragma: no cover - compatibility path
@@ -198,9 +198,7 @@ def pin_mask_for_square(
 def locate_captured_piece(target_square: int, capturing_piece: int) -> int:
     """Return the index of the captured piece for the supplied move."""
 
-    search_range = (
-        BLACK_CAPTURE_RANGE if WP <= capturing_piece <= WK else WHITE_CAPTURE_RANGE
-    )
+    search_range = BLACK_CAPTURE_RANGE if WP <= capturing_piece <= WK else WHITE_CAPTURE_RANGE
     target_mask = SQUARE_BBS[target_square]
 
     for index in search_range:
@@ -217,12 +215,13 @@ def scan_slider_checks_and_pins(
     enemy_queen_bb: int,
     friendly_occupancies: int,
     enemy_occupancies: int,
-) -> tuple[int, int, list[Pin]]:
+) -> tuple[int, int, list[Pin], dict[int, int]]:
     """Identify slider-based checks and pins on the supplied king square.
 
-    Returns ``(check_count, check_mask, pins)`` where ``check_mask`` contains the
+    Returns ``(check_count, check_mask, pins, pin_lookup)`` where ``check_mask`` contains the
     squares that must be occupied to block or capture a single checker and
     ``pins`` holds the pinned piece alongside the pinning piece.
+    ``pin_lookup`` maps pinned squares to their allowed ray masks.
     """
 
     check_count = 0
@@ -431,9 +430,10 @@ def generate_leaper_moves(
 
     for starting_square in iterate_bits(piece_bitboard):
         allowed_mask = (
-            (pin_get(starting_square, MAX_ULONG) if pin_get else pin_mask_for_square(pins, king_state.king_square, starting_square))
-            & check_mask
-        )
+            pin_get(starting_square, MAX_ULONG)
+            if pin_get
+            else pin_mask_for_square(pins, king_state.king_square, starting_square)
+        ) & check_mask
         if allowed_mask == 0:
             continue
 
@@ -467,7 +467,11 @@ def generate_slider_moves(
     pin_get = pins.get if isinstance(pins, Mapping) else None
 
     for starting_square in iterate_bits(piece_bitboard):
-        pin_mask = pin_get(starting_square, MAX_ULONG) if pin_get else pin_mask_for_square(pins, king_state.king_square, starting_square)
+        pin_mask = (
+            pin_get(starting_square, MAX_ULONG)
+            if pin_get
+            else pin_mask_for_square(pins, king_state.king_square, starting_square)
+        )
         if pin_mask == 0:
             continue
 
@@ -553,7 +557,11 @@ def generate_pawn_moves(
     pin_get = pins.get if isinstance(pins, Mapping) else None
 
     for starting_square in iterate_bits(pawn_bitboard):
-        pin_mask = pin_get(starting_square, MAX_ULONG) if pin_get else pin_mask_for_square(pins, king_state.king_square, starting_square)
+        pin_mask = (
+            pin_get(starting_square, MAX_ULONG)
+            if pin_get
+            else pin_mask_for_square(pins, king_state.king_square, starting_square)
+        )
         start_mask = SQUARE_BBS[starting_square]
         allowed_mask = check_mask & pin_mask
 
@@ -571,10 +579,7 @@ def generate_pawn_moves(
                 if (start_mask & start_rank_mask) != 0:
                     forward_two_square = starting_square + forward_two_delta
                     forward_two_mask = SQUARE_BBS[forward_two_square]
-                    if (
-                        (forward_two_mask & combined_occupancies) == 0
-                        and (forward_two_mask & allowed_mask) != 0
-                    ):
+                    if (forward_two_mask & combined_occupancies) == 0 and (forward_two_mask & allowed_mask) != 0:
                         moves_append(Move(starting_square, forward_two_square, double_push_tag, pawn_piece))
 
         capture_targets = (pawn_attack_table[starting_square] & enemy_occupancies) & allowed_mask
@@ -1258,20 +1263,10 @@ def perft_inline(depth: int, ply: int) -> int:
     global ep
 
     white_occupancies: int = (
-        piece_array[WP]
-        | piece_array[WN]
-        | piece_array[WB]
-        | piece_array[WR]
-        | piece_array[WQ]
-        | piece_array[WK]
+        piece_array[WP] | piece_array[WN] | piece_array[WB] | piece_array[WR] | piece_array[WQ] | piece_array[WK]
     )
     black_occupancies: int = (
-        piece_array[BP]
-        | piece_array[BN]
-        | piece_array[BB]
-        | piece_array[BR]
-        | piece_array[BQ]
-        | piece_array[BK]
+        piece_array[BP] | piece_array[BN] | piece_array[BB] | piece_array[BR] | piece_array[BQ] | piece_array[BK]
     )
 
     combined_occupancies: int = white_occupancies | black_occupancies

@@ -355,6 +355,8 @@ def test_pin_mask_for_square_returns_ray_mask() -> None:
     expected = const.INBETWEEN_BITBOARDS[king][const.E8]
     assert logic.pin_mask_for_square(pins, king, const.E2) == expected
     assert logic.pin_mask_for_square(pins, king, const.D2) == logic.MAX_ULONG
+    assert logic.pin_mask_for_square({const.E2: expected}, king, const.E2) == expected
+    assert logic.pin_mask_for_square({const.E2: expected}, king, const.D2) == logic.MAX_ULONG
 
 
 def test_locate_captured_piece_identifies_target() -> None:

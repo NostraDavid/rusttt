@@ -1,13 +1,13 @@
 # https://docs.astral.sh/uv/concepts/projects/layout/
 [build-system]
-requires = ["uv_build>=0.8.7,<0.9.0"]
+requires = ["uv_build>=0.13.1,<0.14.0"]
 build-backend = "uv_build"
 
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 [project]
 name = "rusttt"
 version = "0.1.0"
-description = "Add your description here"
+description = "Bitboard-based chess move generation and perft."
 readme = "README.md"
 authors = [
     { name = "NostraDavid", email = "55331731+NostraDavid@users.noreply.github.com" },
